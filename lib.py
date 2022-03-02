@@ -1,7 +1,8 @@
 import ffmpeg # type: ignore
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Tuple, Dict
 from abc import ABC, abstractmethod
 from enum import Enum, auto
+from PIL import Image
 
 class Audio:
   def __init__(self, filename: str, delay: float = 0, loudness: float = -12.0):
@@ -157,6 +158,28 @@ class Playlist:
   def render(self, output_filename: str) -> None:
     ffmpeg.output(self.to_stream(), output_filename).run()
 
+class StaticOverlay(Stream):
+    def __init__(self, filename: str, overlays: Dict[str, Dict[str, int]], intervals: List[Tuple[int, int, str]], delay: float = 0):
+        self.filename = filename
+        self.overlays = overlays
+        self.intervals = intervals
+        self.delay = delay
+
+    def to_stream(self, start_timestamp: float, end_timestamp: float):
+        dur = end_timestamp - start_timestamp
+        stream = ffmpeg.input(self.filename, ss=start_timestamp-self.delay, t=dur)
+        # do first overlay
+        start, end, img_path = self.intervals[0]
+        x, y, _, _ = self.overlays[img_path]
+        img = ffmpeg.input(img_path)
+        v = ffmpeg.filter([stream, img], filter_name='overlay', x=x, y=y, enable='between(t, {}, {})'.format(start, end))
+        for i in range(1, len(self.overlays)):
+            start, end, img_path = self.intervals[i]
+            x, y, _, _ = self.overlays[img_path]
+            img = ffmpeg.input(img_path)
+            v = ffmpeg.filter([v, img], filter_name='overlay', x=x, y=y, enable='between(t, {}, {})'.format(start, end))
+        return v
+
 def hms(timestamp: str) -> float:
   parts = timestamp.split(':')
   assert 1 <= len(parts) <= 3
@@ -164,3 +187,23 @@ def hms(timestamp: str) -> float:
   m = float(parts[-2]) if len(parts) >= 2 else 0
   h = float(parts[-3]) if len(parts) >= 3 else 0
   return 60*60*h + 60*m + s
+
+def parse_static_overlay_config(filename):
+    overlays = {}
+    intervals = []
+    with open(filename) as file:
+        lines = [line.rstrip('\n') for line in file]
+        video_path = lines[0]
+        num_overlays = int(lines[1])
+        for line in lines[2:2+num_overlays]:
+            img, x, y, w, h = line.split()
+            overlays[img] = {
+                'x': int(x),
+                'y': int(y),
+                'w': int(w),
+                'h': int(h)
+            }
+        for line in lines[2+num_overlays:]:
+            start, end, img = line.split()
+            intervals.append((int(hms(start)), int(hms(end)), img))
+    return video_path, overlays, intervals
