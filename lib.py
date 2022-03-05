@@ -175,7 +175,7 @@ class StaticOverlay(Stream):
         y = img_info['y']
         img = ffmpeg.input(img_path)
         v = ffmpeg.filter([stream, img], filter_name='overlay', x=x, y=y, enable='between(t, {}, {})'.format(start, end))
-        for i in range(1, len(self.overlays)):
+        for i in range(1, len(self.intervals)):
             start, end, img_path = self.intervals[i]
             img_info = self.overlays[img_path]
             x = img_info['x']
