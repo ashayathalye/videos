@@ -1,8 +1,3 @@
-# Missing Semester: Lecture Videos [![Build Status](https://github.com/missing-semester/videos/workflows/CI/badge.svg)](https://github.com/missing-semester/videos/actions?query=workflow%3ACI)
-
-This repository contains scripts for producing lecture videos for [Missing
-Semester](https://missing.csail.mit.edu).
-
 ## Dependencies
 
 ```bash
@@ -23,5 +18,5 @@ mypy .
 
 ## License
 
-Copyright (c) 2020 Anish Athalye, Jose Javier, and Jon Gjengset. Released under
+Copyright (c) 2024 Ashay Athalye, Anish Athalye, Jose Javier, and Jon Gjengset. Released under
 the MIT License. See [LICENSE.md](LICENSE.md) for details.

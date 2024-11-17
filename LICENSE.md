@@ -1,7 +1,7 @@
 The MIT License (MIT)
 =====================
 
-**Copyright (c) 2020 Anish Athalye (me@anishathalye.com), Jose Javier
+**Copyright (c) 2024 Ashay Athalye (ashay.athalye@icloud.com), Anish Athalye (me@anishathalye.com), Jose Javier
 (josejavier.gonzalez.ortiz@gmail.com), Jon Gjengset (jon@thesquareplanet.com)**
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
